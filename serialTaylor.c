@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>
 
 const double PI = 3.1415926535897932384626433832795;
 
@@ -56,6 +57,9 @@ double getAngle(char *argv[])
 
 int main(int argc, char *argv[])
 {
+  double time_spent = 0.0;
+
+  clock_t begin = clock();
 
   if (argc != 5)
   {
@@ -82,6 +86,12 @@ int main(int argc, char *argv[])
   printf("Sin %0.50f\n", sin);
   printf("Cos %0.50f\n", cos);
   printf("Tan %0.2f\n", tan);
+
+  clock_t end = clock();
+
+  time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
+
+  printf("The elapsed time is %f seconds\n", time_spent);
 
   return 0;
 }
