@@ -7,8 +7,7 @@ const double PI = 3.1415926535897932384626433832795;
 
 double factorialOf(int n)
 {
-  int fact = (n == 1 || n == 0) ? 1 : n * factorialOf(n - 1);
-  return fact;
+  return (n == 1 || n == 0) ? 1 : n * factorialOf(n - 1);
 }
 
 double sinX(int iteration, double angle)
@@ -18,7 +17,11 @@ double sinX(int iteration, double angle)
 
   if (iteration % 2 == 1)
   {
-    return sinX(iteration - 1, angle) + pow(angle, iteration) / factorialOf(iteration);
+    double step = pow(angle, iteration) / factorialOf(iteration);
+    double result = sinX(iteration - 1, angle) + step;
+    // printf("SinX Iteration:%d: = %0.2f\n", iteration, step);
+    // printf("Result: %0.2f\n\n", result);
+    return result;
   }
   else
   {
@@ -28,12 +31,16 @@ double sinX(int iteration, double angle)
 
 double cosX(int iteration, double angle)
 {
-  if (iteration <= 0)
-    return 1;
+  if (iteration <= -1)
+    return 0;
 
   if (iteration % 2 == 0)
   {
-    return pow(angle, iteration) / factorialOf(iteration) + cosX(iteration - 1, angle);
+    double step = pow(angle, iteration) / factorialOf(iteration);
+    double result = cosX(iteration - 1, angle) + step;
+    // printf("CosX Iteration:%d: = %0.2f\n", iteration, step);
+    // printf("Result: %0.2f\n\n", result);
+    return result;
   }
   else
   {
@@ -46,14 +53,17 @@ double tanX(double sin, double cos)
   return sin / cos;
 }
 
-double angleToRad(double deg, double min, double sec)
+double angleToRad(double angle)
 {
-  return deg + (min / 60.0) + (sec / 3600.0);
+  return angle * PI / 180.0;
 }
 
 double getAngle(char *argv[])
 {
-  return angleToRad(atof(argv[1]), atof(argv[2]), atof(argv[3]));
+
+  double angle = atof(argv[1]) + (atof(argv[2]) / 60) + (atof(argv[3]) / 3600);
+
+  return angle;
 }
 
 int main(int argc, char *argv[])
@@ -74,7 +84,7 @@ int main(int argc, char *argv[])
 
   double angle = getAngle(argv);
 
-  angle = angle * PI / 180.0;
+  angle = angleToRad(angle);
 
   printf("Iterations: %d\n", iterations);
   printf("Angle: %0.2f\n", angle);
@@ -84,8 +94,8 @@ int main(int argc, char *argv[])
   double cos = cosX(iterations, angle);
   double tan = tanX(sin, cos);
 
-  printf("Sin %0.20f\n", sin);
-  printf("Cos %0.20f\n", cos);
+  printf("Sin %0.2f\n", sin);
+  printf("Cos %0.2f\n", cos);
   printf("Tan %0.2f\n", tan);
 
   clock_t end = clock();
