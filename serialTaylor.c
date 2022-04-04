@@ -7,7 +7,8 @@ const double PI = 3.1415926535897932384626433832795;
 
 double factorialOf(int n)
 {
-  return (n == 1 || n == 0) ? 1 : n * factorialOf(n - 1);
+  int fact = (n == 1 || n == 0) ? 1 : n * factorialOf(n - 1);
+  return fact;
 }
 
 double sinX(int iteration, double angle)
@@ -17,11 +18,11 @@ double sinX(int iteration, double angle)
 
   if (iteration % 2 == 1)
   {
-    return pow(angle, iteration) / factorialOf(iteration);
+    return sinX(iteration - 1, angle) + pow(angle, iteration) / factorialOf(iteration);
   }
   else
   {
-    return pow(angle, iteration - 1) / factorialOf(iteration - 1);
+    return sinX(iteration - 1, angle);
   }
 }
 
@@ -32,11 +33,11 @@ double cosX(int iteration, double angle)
 
   if (iteration % 2 == 0)
   {
-    return pow(angle, iteration) / factorialOf(iteration);
+    return pow(angle, iteration) / factorialOf(iteration) + cosX(iteration - 1, angle);
   }
   else
   {
-    return pow(angle, iteration - 1) / factorialOf(iteration - 1);
+    return cosX(iteration - 1, angle);
   }
 }
 
@@ -83,8 +84,8 @@ int main(int argc, char *argv[])
   double cos = cosX(iterations, angle);
   double tan = tanX(sin, cos);
 
-  printf("Sin %0.50f\n", sin);
-  printf("Cos %0.50f\n", cos);
+  printf("Sin %0.20f\n", sin);
+  printf("Cos %0.20f\n", cos);
   printf("Tan %0.2f\n", tan);
 
   clock_t end = clock();
