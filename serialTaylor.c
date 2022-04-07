@@ -66,9 +66,33 @@ double getAngle(char *argv[])
   return angle;
 }
 
+double ErrorSin(double sin, double rawSinRad)
+{
+
+  double error = fabs(rawSinRad - sin);
+
+  return error;
+}
+
+double ErrorCos(double cos, double rawCosRad)
+{
+
+  double error = fabs(rawCosRad - cos);
+
+  return error;
+}
+
+double ErrorTg(double tan, double rawTgRad)
+{
+
+  double error = fabs(rawTgRad - tan);
+
+  return error;
+}
+
 int main(int argc, char *argv[])
 {
-  double time_spent = 0.0;
+  double time_spent = 0.0, rawsin, rawcos, rawtg;
 
   clock_t begin = clock();
 
@@ -82,6 +106,18 @@ int main(int argc, char *argv[])
 
   int iterations = (int)atoi(argv[4]);
 
+  if (iterations == 10)
+  {
+  rawsin = 874406.74; // sen de 30 graus, 10 iteracoes, valor em rad 
+  rawcos = 2573140.52; // cos de 30 graus, 10 iteracoes, valor em rad 
+  rawtg = 0.00593412; // tg de 30 graus, 10 iteracoes, valor em rad 
+  } else if (iterations == 15)
+  {
+  rawsin = 153697.26; // sen de 30 graus, 15 iteracoes, valor em rad 
+  rawcos = 78965.25; // cos de 30 graus, 15 iteracoes, valor em rad 
+  rawtg = 0.033964; // tg de 30 graus, 15 iteracoes, valor em rad 
+  } 
+
   double angle = getAngle(argv);
 
   angle = angleToRad(angle);
@@ -94,9 +130,26 @@ int main(int argc, char *argv[])
   double cos = cosX(iterations, angle);
   double tan = tanX(sin, cos);
 
+  double error_sin = ErrorSin(sin,rawsin); 
+  double error_cos = ErrorSin(cos,rawcos); 
+  double error_tg = ErrorSin(tan,rawtg); 
+
   printf("Sin %0.2f\n", sin);
   printf("Cos %0.2f\n", cos);
   printf("Tan %0.2f\n", tan);
+  
+
+  if (iterations == 10 || iterations == 15)
+  {
+    printf("\n************ Diferenca/Erro ************\n");
+    printf("\nError Sin %0.2f\n", error_sin); 
+    printf("Error Cos %0.2f\n", error_cos); 
+    printf("Error Tg %0.2f\n\n", error_tg); 
+  } else 
+  {
+    printf("\n##### ERROR Diferenca/Erro #####\n");
+    printf("\nCannot recognize input 'interation' in expression specification\n\n"); //
+  }
 
   clock_t end = clock();
 
