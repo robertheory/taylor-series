@@ -100,10 +100,10 @@ double ErrorSin(double sin, int interations)
   double error;
 
   if (interations == 10)
-    error = fabs(0.5000001944 - sin);
+    error = fabs(874406.74 - sin);
 
   if (interations == 15)
-    error = fabs(0.5000001943 - sin);
+    error = fabs(153697.26 - sin);
 
   return error;
 }
@@ -156,21 +156,74 @@ int main(int argc, char *argv[])
   angle = angleToRad(angle);
 
   printf("Iterations: %d\n", iterations);
-  printf("Angle: %0.10f\n", angle);
+  printf("Angle: %0.6f\n", angle);
   printf("---------------\n");
 
-  double sin = sinX(iterations, angle);
-  double cos = cosX(iterations, angle);
-  double tan = tanX(sin, cos);
+  double sin = 0.0;
+  double cos = 0.0;
+  double tan = 0.0;
 
-  printf("Sin %0.10f\n", sin);
-  printf("Cos %0.10f\n", cos);
-  printf("Tan %0.10f\n", tan);
+  int n = 0;
+  bool isSum = false;
 
-  printf("\n************ Diferenca/Erro ************\n");
-  printf("\nError Sin %0.10f\n", ErrorSin(sin, iterations));
-  printf("Error Cos %0.10f\n", ErrorSin(cos, iterations));
-  printf("Error Tg %0.10f\n\n", ErrorTg(tan, iterations));
+  for (n = 1; n <= iterations; n++)
+  {
+    if (n % 2 == 1)
+    {
+      if (n == 1)
+      {
+        sin += angle;
+        isSum = false;
+      }
+      else
+      {
+        double step = pow(angle, n) / factorialOf(n);
+
+        if (isSum)
+        {
+          sin += step;
+        }
+        else
+        {
+          sin -= step;
+        }
+        isSum = !isSum;
+      }
+    }
+    n++;
+  }
+
+  isSum = false;
+  for (n = 0; n <= iterations; n++)
+  {
+    if (n % 2 == 0)
+    {
+      if (n == 0)
+      {
+        cos += 1;
+      }
+      else
+      {
+        double step = pow(angle, n) / factorialOf(n);
+        if (isSum)
+        {
+          cos += step;
+        }
+        else
+        {
+          cos -= step;
+        }
+        isSum = !isSum;
+      }
+    }
+    n++;
+  }
+
+  tan = sin / cos;
+
+  printf("Sin %0.6f\n", sin);
+  printf("Cos %0.6f\n", cos);
+  printf("Tan %0.6f\n", tan);
 
   clock_t end = clock();
 
