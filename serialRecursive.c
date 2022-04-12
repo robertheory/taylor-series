@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <math.h>
 #include <time.h>
 
@@ -12,40 +13,68 @@ double factorialOf(int n)
 
 double sinX(int iteration, double angle)
 {
-  if (iteration <= 0)
-    return 1;
+  int n = 1;
+  double result = 0.0;
+  bool isSum = false;
+  for (; n <= iteration; n++)
+  {
+    if (n % 2 == 1)
+    {
+      if (n == 1)
+      {
+        result += angle;
+        isSum = false;
+      }
+      else
+      {
+        double step = pow(angle, n) / factorialOf(n);
 
-  if (iteration % 2 == 1)
-  {
-    double step = pow(angle, iteration) / factorialOf(iteration);
-    double result = sinX(iteration - 1, angle) + step;
-    // printf("SinX Iteration:%d: = %0.2f\n", iteration, step);
-    // printf("Result: %0.2f\n\n", result);
-    return result;
+        if (isSum)
+        {
+          result += step;
+        }
+        else
+        {
+          result -= step;
+        }
+        isSum = !isSum;
+      }
+    }
+    n++;
   }
-  else
-  {
-    return sinX(iteration - 1, angle);
-  }
+  return result;
 }
 
 double cosX(int iteration, double angle)
 {
-  if (iteration <= -1)
-    return 0;
-
-  if (iteration % 2 == 0)
+  int n = 0;
+  double result = 0.0;
+  bool isSum = false;
+  for (; n <= iteration; n++)
   {
-    double step = pow(angle, iteration) / factorialOf(iteration);
-    double result = cosX(iteration - 1, angle) + step;
-    // printf("CosX Iteration:%d: = %0.2f\n", iteration, step);
-    // printf("Result: %0.2f\n\n", result);
-    return result;
+    if (n % 2 == 0)
+    {
+      if (n == 0)
+      {
+        result += 1;
+      }
+      else
+      {
+        double step = pow(angle, n) / factorialOf(n);
+        if (isSum)
+        {
+          result += step;
+        }
+        else
+        {
+          result -= step;
+        }
+        isSum = !isSum;
+      }
+    }
+    n++;
   }
-  else
-  {
-    return cosX(iteration - 1, angle);
-  }
+  return result;
 }
 
 double tanX(double sin, double cos)
@@ -55,7 +84,7 @@ double tanX(double sin, double cos)
 
 double angleToRad(double angle)
 {
-  return angle * PI / 180.0;
+  return (angle * PI) / 180.0;
 }
 
 double getAngle(char *argv[])
@@ -66,48 +95,88 @@ double getAngle(char *argv[])
   return angle;
 }
 
-double ErrorSin(double sin, int interations)
+double ErrorSin(double sin, int interations, double angle_sin_20)
 {
   double error;
+  sin = fabs(sin);
+  //printf("\nSeno = %f\n", sin);
+  //printf("\nIteracao = %d\n", interations);
 
   if (interations == 10)
+  {
+    //printf("\nEntrei na iteracao 10\n");
     error = fabs(874406.74 - sin);
-
-  if (interations == 15)
-    error = fabs(153697.26 - sin);
-
+    //printf("\nError 10 final = %f\n", error);
+  } 
+  else if (interations == 15)
+  {
+    //printf("\nEntrei na iteracao 15\n");
+    error = fabs(153697.26 - sin);  
+    //printf("\nError 15 final = %f\n", error);
+  }
+  else if (interations == 20)
+  {
+    //printf("\nEntrei na iteracao 15\n");
+    error = fabs(angle_sin_20 - sin);  
+    //printf("\nError 15 final = %f\n", error);
+  }
   return error;
 }
 
-double ErrorCos(double cos, int interations)
+double ErrorCos(double cos, int interations, double angle_cos_20)
 {
   double error;
+  cos = fabs(cos);
 
   if (interations == 10)
+  {
     error = fabs(2573140.52 - cos);
-
-  if (interations == 15)
+  }
+  else if (interations == 15)
+  {
     error = fabs(78965.25 - cos);
+  }
+  else if (interations == 20)
+  {
+    error = fabs( angle_cos_20 - cos);
+  }
 
   return error;
 }
 
-double ErrorTg(double tan, int interations)
+double ErrorTg(double tan, int interations, double angle_tg_20)
 {
   double error;
+  tan = fabs(tan);
 
   if (interations == 10)
+  {
     error = fabs(0.00593412 - tan);
-
-  if (interations == 15)
+  }
+  else if (interations == 15)
+  {
     error = fabs(0.033964 - tan);
+  }
+  else if (interations == 20)
+  {
+    error = fabs(angle_tg_20 - tan);
+  }
 
   return error;
 }
 
 int main(int argc, char *argv[])
 {
-  double time_spent = 0.0, rawsin, rawcos, rawtg;
+
+  double time_spent = 0.0;
+
+  double angle_sin_20 = 5924687721 * pow(10,10);
+  double angle_cos_20 = 1033754641 * pow(10,11);
+  double angle_tg_20 = 0.5731232040969381;
+
+  //printf("\n Seno de 20 iteracoes = %f \n", angle_sin_20);
+  //printf("\n Cos de 20 iteracoes = %f \n", angle_cos_20);
+  //printf("\n Tg de 20 iteracoes = %f \n", angle_tg_20);
 
   clock_t begin = clock();
 
@@ -121,22 +190,7 @@ int main(int argc, char *argv[])
 
   int iterations = (int)atoi(argv[4]);
 
-  if (iterations == 10)
-  {
-    rawsin = 874406.74;  // sen de 30 graus, 10 iteracoes, valor em rad
-    rawcos = 2573140.52; // cos de 30 graus, 10 iteracoes, valor em rad
-    rawtg = 0.00593412;  // tg de 30 graus, 10 iteracoes, valor em rad
-  }
-  else if (iterations == 15)
-  {
-    rawsin = 153697.26; // sen de 30 graus, 15 iteracoes, valor em rad
-    rawcos = 78965.25;  // cos de 30 graus, 15 iteracoes, valor em rad
-    rawtg = 0.033964;   // tg de 30 graus, 15 iteracoes, valor em rad
-  }
-
   double angle = getAngle(argv);
-
-  // angle = angleToRad(angle);
 
   printf("Iterations: %d\n", iterations);
   printf("Angle: %0.2f\n", angle);
@@ -146,18 +200,28 @@ int main(int argc, char *argv[])
   double cos = cosX(iterations, angle);
   double tan = tanX(sin, cos);
 
-  double error_sin = ErrorSin(sin, rawsin);
-  double error_cos = ErrorSin(cos, rawcos);
-  double error_tg = ErrorSin(tan, rawtg);
+// Conversao para radiano
+
+  cos = angleToRad(cos);
+  sin = angleToRad(sin);
+  tan = angleToRad(tan);
+
+  angle_sin_20 = angleToRad(angle_sin_20);
+  angle_cos_20 = angleToRad(angle_cos_20);
+  angle_tg_20 = angleToRad(angle_tg_20);
+
+  printf("\n Seno em rad de 20 iteracoes = %f ", angle_sin_20);
+  printf("\n Cos em rad de 20 iteracoes = %f ", angle_cos_20);
+  printf("\n Tg em rad de 20 iteracoes = %f \n\n", angle_tg_20);
 
   printf("Sin %0.3f\n", sin);
   printf("Cos %0.3f\n", cos);
-  printf("Tan %0.3f\n", tan);
+  printf("Tan %0.8f\n", tan);
 
-  printf("\n************ Diferenca/Erro ************\n");
-  printf("\nError Sin %0.3f\n", ErrorSin(sin, iterations));
-  printf("Error Cos %0.3f\n", ErrorSin(cos, iterations));
-  printf("Error Tg %0.3f\n\n", ErrorTg(tan, iterations));
+  printf("\n***** Diferenca/Erro *****\n");
+  printf("\nError Sin %0.10f\n", ErrorSin(sin, iterations, angle_sin_20));
+  printf("Error Cos %0.10f\n", ErrorCos(cos, iterations, angle_cos_20));
+  printf("Error Tg %0.10f\n\n", ErrorTg(tan, iterations, angle_tg_20));
 
   clock_t end = clock();
 
