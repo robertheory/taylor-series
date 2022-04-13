@@ -52,9 +52,10 @@ int main(int argc, char *argv[])
     angle = getAngle(argv);
     angle = angleToRad(angle);
 
-    printf("Iterations: %d\n", iterations);
-    printf("Angle: %0.6f\n", angle);
-    printf("---------------\n");
+    printf("\n----------------------------------------------------------------------\n");
+    printf("--- Iterations: %d \n", iterations);
+    printf("--- Angle: %0.6f \n", angle);
+    printf("----------------------------------------------------------------------\n");
 
     startTime = MPI_Wtime();
   }
@@ -64,10 +65,58 @@ int main(int argc, char *argv[])
   MPI_Bcast(&iterations, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
   isSum = false;
-  for (index = rank; index < iterations; index += numprocs)
+
+  for (index = rank + 1; index <= iterations; index++)
   {
-    cos += (double)(pow(-1, index) * pow(angle, 2.0 * index)) / factorialOf(2 * index);
-    sin += (double)(pow(-1, index) * pow(angle, 2 * index + 1)) / factorialOf(2 * index + 1);
+    if (index % 2 == 1)
+    {
+      if (index == 1)
+      {
+        sin += angle;
+        isSum = false;
+      }
+      else
+      {
+        double step = pow(angle, index) / factorialOf(index);
+
+        if (isSum)
+        {
+          sin += step;
+        }
+        else
+        {
+          sin -= step;
+        }
+        isSum = !isSum;
+      }
+    }
+    index++;
+  }
+
+  isSum = false;
+  for (index = rank; index <= iterations; index++)
+  {
+    if (index % 2 == 0)
+    {
+      if (index == 0)
+      {
+        cos += 1;
+      }
+      else
+      {
+        double step = pow(angle, index) / factorialOf(index);
+        if (isSum)
+        {
+          cos += step;
+        }
+        else
+        {
+          cos -= step;
+        }
+        isSum = !isSum;
+      }
+    }
+    index++;
   }
 
   MPI_Reduce(&sin, &sum_sin, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
@@ -77,15 +126,17 @@ int main(int argc, char *argv[])
 
   if (rank == 0)
   {
-    printf("Sin %0.6f\n", sin);
-    printf("Cos %0.6f\n", cos);
-    printf("Tan %0.6f\n", tan);
+    printf("--- Sin %0.50f \n", sin);
+    printf("--- Cos %0.50f \n", cos);
+    printf("--- Tan %0.50f \n", tan);
 
     endTime = MPI_Wtime();
 
     time_spent = fabs(endTime - startTime);
 
-    printf("The elapsed time is %f seconds\n", time_spent);
+    printf("----------------------------------------------------------------------\n");
+    printf("--- The elapsed time is %f seconds\n", time_spent);
+    printf("----------------------------------------------------------------------\n");
   }
   MPI_Finalize();
   return 0;
